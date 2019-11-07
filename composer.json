@@ -1,0 +1,56 @@
+{
+    "name": "surda/mjml-nette",
+    "description": "MJML integration into Nette Framework",
+    "keywords": ["mjml", "nette", "mail"],
+    "type": "library",
+    "homepage": "http://surani.cz",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Radek Šuráni",
+            "homepage": "http://surani.cz",
+            "email": "radek@surani.cz"
+        }
+    ],
+    "support": {
+        "email": "radek@surani.cz",
+        "issues": "https://github.com/surda/mjml-nette/issues"
+    },
+    "require": {
+        "php": ">=7.1",
+        "nette/application": "^3.0",
+        "nette/di": "^3.0",
+        "latte/latte": "^2.5",
+        "symfony/process": "^3.4 || ^4.0"
+    },
+    "require-dev": {
+        "nette/tester": "^2.0",
+        "ninjify/nunjuck": "^0.3",
+        "phpstan/phpstan": "^0.11",
+        "phpstan/phpstan-strict-rules": "^0.11",
+        "phpstan/phpstan-nette": "^0.11",
+        "phpstan/phpstan-deprecation-rules": "^0.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "Surda\\Mjml\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Surda\\Mjml\\": "tests/cases"
+        }
+    },
+    "scripts": {
+        "tests": [
+            "vendor/bin/tester -s -p php -C tests/cases"
+        ],
+        "phpstan": [
+            "vendor/bin/phpstan analyse -l max -c phpstan.neon src"
+        ],
+        "da": [
+            "composer dump-autoload -o"
+        ]
+    },
+    "minimum-stability": "stable"
+}
