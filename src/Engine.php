@@ -27,16 +27,15 @@ class Engine
         $this->renderer = $renderer;
     }
 
-
     /**
      * @param string      $mjmlFile
      * @param string|null $latteFile
-     * @return string file
+     * @return string latte file
      */
-    public function createTemplate(string $mjmlFile, ?string $latteFile = NULL): string
+    public function renderLatteFile(string $mjmlFile, ?string $latteFile = NULL): string
     {
         if (!is_file($mjmlFile)) {
-            throw new \RuntimeException("Missing template file '$mjmlFile'.");
+            throw new \RuntimeException("Missing MJML template file '$mjmlFile'.");
         }
 
         $latteFile = $latteFile ?: $this->getCacheFile($mjmlFile);
@@ -57,8 +56,7 @@ class Engine
         }
 
         if (!is_file($latteFile) || $this->isExpired($mjmlFile, $latteFile)) {
-            $content = $this->renderer->render($this->getContent($mjmlFile));
-
+            $content = $this->renderer->render($mjmlFile);
             if (file_put_contents("$latteFile.tmp", $content) !== strlen($content) || !rename("$latteFile.tmp", $latteFile)) {
                 @unlink("$latteFile.tmp"); // @ - latteFile may not exist
                 throw new \RuntimeException("Unable to create '$latteFile'.");
@@ -76,19 +74,6 @@ class Engine
         @unlink("$latteFile.lock"); // @ latteFile may become locked on Windows
 
         return $latteFile;
-    }
-
-    /**
-     * @param string $file
-     * @return string
-     */
-    private function getContent(string $file): string
-    {
-        if (FALSE === $content = file_get_contents($file)) {
-            throw new \RuntimeException("Unable to load '$file'.");
-        }
-
-        return $content;
     }
 
     /**

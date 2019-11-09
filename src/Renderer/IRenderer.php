@@ -5,8 +5,8 @@ namespace Surda\Mjml\Renderer;
 interface IRenderer
 {
     /**
-     * @param string $content
+     * @param string $file
      * @return string
      */
-    public function render(string $content): string;
+    public function render(string $file): string;
 }

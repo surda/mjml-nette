@@ -9,9 +9,6 @@ class MjmlTemplate
     /** @var string */
     private $file;
 
-    /** @var string */
-    private $latteFile;
-
     /** @var array */
     private $params = [];
 
@@ -32,22 +29,12 @@ class MjmlTemplate
     }
 
     /**
-     * @param string|null $file MJML file
-     * @param string|null $latteFile Latte file
-     * @return string
+     * @param string $file MJML file
+     * @param array  $params
      */
-    public function createTemplate(?string $file = NULL, ?string $latteFile = NULL): string
+    public function render(string $file = NULL, array $params = []): void
     {
-        return $this->engine->createTemplate($file ?: $this->file, $latteFile ?: $this->latteFile);
-    }
-
-    /**
-     * @param string|null $file MJML file
-     * @param array       $params
-     */
-    public function render(?string $file = NULL, array $params = []): void
-    {
-        $latteFile = $this->createTemplate($file ?: $this->file);
+        $latteFile = $this->engine->renderLatteFile($file ?: $this->file);
 
         $this->template->setFile($latteFile);
         $this->template->setParameters($params + $this->params);
@@ -55,13 +42,13 @@ class MjmlTemplate
     }
 
     /**
-     * @param string|null $file MJML file
-     * @param array       $params
+     * @param string $file MJML file
+     * @param array  $params
      * @return string
      */
-    public function renderToString(?string $file = NULL, array $params = []): string
+    public function renderToString(string $file = NULL, array $params = []): string
     {
-        $latteFile = $this->createTemplate($file ?: $this->file);
+        $latteFile = $this->engine->renderLatteFile($file ?: $this->file);
 
         $this->template->setFile($latteFile);
         $this->template->setParameters($params + $this->params);
@@ -107,26 +94,6 @@ class MjmlTemplate
     }
 
     /**
-     * @return string|null
-     */
-    public function getLatteFile(): ?string
-    {
-        return $this->latteFile;
-    }
-
-    /**
-     * @param string $latteFile
-     * @return static
-     */
-    public function setLatteFile(string $latteFile): self
-    {
-        $this->latteFile = $latteFile;
-
-        return $this;
-    }
-
-
-    /**
      * @param array $params
      * @return static
      */
@@ -136,7 +103,6 @@ class MjmlTemplate
 
         return $this;
     }
-
 
     /**
      * @return array

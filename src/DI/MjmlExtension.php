@@ -2,14 +2,15 @@
 
 namespace Surda\Mjml\DI;
 
+use Nette\Application\UI\ITemplateFactory;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Statement;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use stdClass;
-use Surda\Mjml\Renderer\IRenderer;
-use Surda\Mjml\Renderer\BinaryRenderer;
 use Surda\Mjml\Engine;
 use Surda\Mjml\MjmlTemplateFactory;
+use Surda\Mjml\TemplateFactory;
 
 /**
  * @property-read stdClass $config
@@ -23,12 +24,7 @@ class MjmlExtension extends CompilerExtension
         return Expect::structure([
             'debug' => Expect::bool($builder->parameters['debugMode']),
             'tempDir' => Expect::string($builder->parameters['tempDir'] . '/cache/latte'),
-            'renderer' => Expect::string('binary'),
-            'options' => Expect::structure([
-                'bin' => Expect::string('mjml'),
-                'minify' => Expect::bool(TRUE),
-                'validationLevel' => Expect::anyOf('strict', 'soft', 'skip')->default('soft'),
-            ]),
+            'templateFactory' => Expect::anyOf(Expect::string(), Expect::type(Statement::class))->default(TemplateFactory::class),
         ]);
     }
 
@@ -37,14 +33,15 @@ class MjmlExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
         $config = $this->config;
 
-        $renderer = $builder->addDefinition($this->prefix('renderer'))
-            ->setType(IRenderer::class)
-            ->setFactory(BinaryRenderer::class, [$config->options->bin, $config->options->minify, $config->options->validationLevel]);
+        $templateFactory = $builder->addDefinition($this->prefix('templateFactory'))
+            ->setType(ITemplateFactory::class)
+            ->setFactory($config->templateFactory)
+            ->setAutowired(FALSE);
 
-        $builder->addDefinition($this->prefix('engine'))
-            ->setFactory(Engine::class, [$config->tempDir, $config->debug, $renderer]);
+        $engine = $builder->addDefinition($this->prefix('engine'))
+            ->setFactory(Engine::class, [$config->tempDir, $config->debug]);
 
         $builder->addDefinition($this->prefix('factory'))
-            ->setFactory(MjmlTemplateFactory::class);
+            ->setFactory(MjmlTemplateFactory::class, [$templateFactory, $engine]);
     }
 }

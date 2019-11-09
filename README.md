@@ -13,32 +13,66 @@ The recommended way to is via Composer:
 composer require surda/mjml-nette
 ```
 
-After that you have to register extension in config.neon:
+After that you have to register extensions in config.neon:
+
+###Binary renderer
 
 ```yaml
 extensions:
     mjml: Surda\Mjml\DI\MjmlExtension
+    mjml.renderer: Surda\Mjml\DI\MjmlBinaryRendererExtension
 ```
 
-### Default configuration
+List of all configuration options:
 
 ```yaml
 mjml:
     debug: %debugMode%
     tempDir: %tempDir%/cache/latte
-    renderer: binary
+    templateFactory: \Surda\Mjml\TemplateFactory
+
+mjml.renderer:
+    renderer: \Surda\Mjml\Renderer\BinaryRenderer
     options:
         bin: mjml
         minify: FALSE
-        validationLevel: soft # strict, soft or skip
+        validationLevel: strict
+        beautify: TRUE
 ```
-
-## Binary
-
 Install [MJML](https://mjml.io)
 
 ```bash
-$ npm install mjml
+$ npm install -g mjml
+```
+
+###API renderer
+
+```yaml
+extensions:
+    mjml: Surda\Mjml\DI\MjmlExtension
+    mjml.renderer: Surda\Mjml\DI\MjmlApiRendererExtension
+```
+Minimal configuration:
+```yaml
+mjml.renderer:
+    options:
+        applicationId: 'application-id'
+        secretKey: 'secret-key'
+```
+List of all configuration options:
+
+```yaml
+mjml:
+    debug: %debugMode%
+    tempDir: %tempDir%/cache/latte
+    templateFactory: \Surda\Mjml\TemplateFactory
+
+mjml.renderer:
+    renderer: \Surda\Mjml\Renderer\ApiRenderer
+    options:
+        applicationId: 'application-id'
+        secretKey: 'secret-key'
+        uri: 'https://api.mjml.io/v1/render'
 ```
 
 ## Usage
@@ -50,7 +84,7 @@ Template <code>template.mjml</code>
     <mj-body>
         <mj-section>
             <mj-column>
-                <mj-image width="200px" src="https://mjml.io/documentation/images/logo.png"></mj-image>
+                <mj-image width="100px" src="https://mjml.io/assets/img/logo-small.png"></mj-image>
                 <mj-divider border-color="#F45E43"></mj-divider>
                 <mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello {$foo}</mj-text>
             </mj-column>
@@ -96,9 +130,43 @@ class MailSender
 }
 ```
 
-### Mail
+Mail
 
 ![mail](https://raw.githubusercontent.com/surda/mjml-nette/master/doc/mail.png)
+
+##Others
+
+Only render *.latte template from *.mjml template 
+
+```php
+use Surda\Mjml\Engine;
+
+class Convertor 
+{
+    /** @var Engine */
+    private $engine;
+    
+    /**
+     * @param Engine $engine
+     */
+    public function __construct(Engine $engine)
+    {
+        $this->engine = $engine;
+    }
+    
+    public function convert(): void
+    {
+        $mjmlFile = '/path/to/template.mjml';
+        $latteFile = $this->engine->renderLatteFile($mjmlFile);
+
+        // or
+
+        $mjmlFile = '/path/to/template.mjml';
+        $latteFile = '/path/to/template.latte';
+        $this->engine->renderLatteFile($mjmlFile, $latteFile);
+    }
+}
+```
 
 ---
 

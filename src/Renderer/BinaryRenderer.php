@@ -15,38 +15,45 @@ class BinaryRenderer implements IRenderer
     /** @var string */
     private $validationLevel;
 
+    /** @var bool */
+    private $beautify;
+
     /**
-     * @param string $bin
-     * @param bool   $minify
-     * @param string $validationLevel
+     * @param array $options
      */
-    public function __construct(string $bin, bool $minify, string $validationLevel)
+    public function __construct(array $options)
     {
-        $this->bin = $bin;
-        $this->minify = $minify;
-        $this->validationLevel = $validationLevel;
+        $this->bin = $options['bin'];
+        $this->minify = $options['minify'];
+        $this->validationLevel = $options['validationLevel'];
+        $this->beautify = $options['beautify'];
     }
 
     /**
-     * @param string $content
+     * @param string $file
      * @return string
+     * @throws \RuntimeException
      */
-    public function render(string $content): string
+    public function render(string $file): string
     {
         $arguments = [
             $this->bin,
-            '-i',
+            $file,
             '-s',
         ];
 
         array_push($arguments, '--config.validationLevel', $this->validationLevel);
+
+        if ($this->beautify === FALSE) {
+            array_push($arguments, '--config.beautify', 'false');
+        }
 
         if ($this->minify === TRUE) {
             array_push($arguments, '--config.minify', 'true');
         }
 
         $process = new Process($arguments);
-        $process->setInput($content);
+        $process->setInput($file);
         $process->mustRun();
 
         return $process->getOutput();
