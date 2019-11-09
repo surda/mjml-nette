@@ -15,7 +15,7 @@ composer require surda/mjml-nette
 
 After that you have to register extensions in config.neon:
 
-###Binary renderer
+### Binary renderer
 
 ```yaml
 extensions:
@@ -45,7 +45,7 @@ Install [MJML](https://mjml.io)
 $ npm install -g mjml
 ```
 
-###API renderer
+### API renderer
 
 ```yaml
 extensions:
@@ -134,7 +134,7 @@ Mail
 
 ![mail](https://raw.githubusercontent.com/surda/mjml-nette/master/doc/mail.png)
 
-##Others
+## Others
 
 Only render *.latte template from *.mjml template 
 
